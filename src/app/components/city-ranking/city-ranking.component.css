@@ -1,0 +1,130 @@
+.cover-img {
+    background: var(--clr-primary-400);
+    
+}
+
+.shadow {
+    position: relative;
+    background: var(--clr-cover);
+}
+
+.arrow-button {
+    cursor: pointer;
+    margin: 2rem 1rem;
+    padding: 0.2rem 1rem;
+    border: none;
+    border-radius: 15px;
+    font-size: var(--fs-410);
+    background-color: var(--clr-primary-400);
+    color: var(--clr-primary-100);
+}
+
+.arrow-button:hover {
+    background-color: var(--clr-primary-300);
+}
+
+.city-name {
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: var(--fs-500);
+    font-weight: var(--fw-bold);
+    color: var(--clr-primary-100);
+    text-shadow: 1px 1px 2px black;
+}
+
+b {
+    font-weight: var(--fw-semibold);
+}
+
+.city-desc {
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+    font-size: var(--fs-400);
+    font-weight: var(--fw-regular);
+    color: var(--clr-primary-100);
+    text-shadow: 1px 1px 2px black;
+}
+
+.city-score {
+    text-align: left;
+    padding-left: 0.5rem;
+    font-size: var(--fs-300);
+    font-weight: var(--fw-regular);
+    font-style: italic;
+    color: var(--clr-primary-100);
+}
+
+.city-score:last-of-type {
+    padding-bottom: 0.5rem;
+}
+
+.list-group {
+    margin: 2rem 1rem;
+}
+
+.score-info {
+    position: relative;
+    list-style: none;
+    margin: 0.5rem;
+}
+
+.total-width {
+    position: absolute;
+    margin-top: 0.2rem;
+    width: 10rem;
+    height: 0.8rem;
+    border-radius: 15px;
+    background-color: var(--clr-secondary-100);
+}
+
+.score {
+    position: absolute;
+    margin-top: 0.2rem;
+    width: 8rem;
+    height: 0.8rem;
+    border-radius: 15px;
+    background-color: var(--clr-primary-400);
+}
+
+.score-name {
+    border-bottom: 1px solid var(--clr-secondary-100);
+    text-align: right;
+    padding-bottom: 0.5rem;
+    font-size: var(--fs-300);
+    font-style: italic;
+    color: var(--clr-secondary-100)
+}
+
+@media screen and (min-width: 576px) {
+    .list-group {
+        margin: 2rem 6rem;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+
+    .list-group {
+        margin: 2rem 1rem;
+        columns: 2;
+    }
+
+    .city-desc {
+        margin: 0 2rem 1rem 2rem;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .cover-img {
+        background: var(--clr-primary-400);
+    }
+
+    .city-desc {
+        margin: 0 4rem 1rem 4rem;
+    }
+
+    .list-group {
+        margin: 2rem 1rem;
+        columns: 2;
+    }
+}

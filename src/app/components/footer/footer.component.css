@@ -1,0 +1,38 @@
+footer {
+    width: 100%;
+    padding: 0.5rem 0;
+    text-align: center;
+    background-color: var(--clr-secondary-400);
+    color: var(--clr-primary-100);
+    font-size: var(--fs-300);
+}
+  
+.footer-item {
+    margin: 0.5em 0;
+}
+
+.icon {
+    margin: 0 0.2rem;
+}
+  
+.footer-link {
+    color: var(--clr-primary-100);
+}
+  
+.footer-link:hover {
+    color: var(--clr-primary-200);
+}
+  
+.footer-link:visited {
+    color: var(--clr-primary-400);
+}
+
+@media screen and (min-width: 768px) {
+    
+    footer {
+        display: flex;
+        justify-content: space-around;
+        padding: 1rem 0;
+    }
+
+}

@@ -1,0 +1,15 @@
+<section>
+    <!-- search bar container-->
+    <div class="container main">
+        <h1 class="heading">Learn about the quality of life city ranking.</h1>
+
+        <form #requestingCity="ngForm" (ngSubmit)="onSubmit(requestedCity.value)">
+            <!--label-->
+            <label for="city-search">Insert the name of the city here:</label>
+            <!--search bar-->
+            <input type="search" id="city-search" #requestedCity>
+            <!--search button-->
+            <button class="button" type="submit"><i class="fa-solid fa-search"></i></button>
+        </form>
+    </div>
+</section>

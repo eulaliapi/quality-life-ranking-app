@@ -1,0 +1,5 @@
+.inverted {
+    min-height: 50vh;
+    background-color: var(--clr-primary-100);
+    color: var(--clr-primary-400)
+  }

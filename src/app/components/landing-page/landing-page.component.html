@@ -1,0 +1,5 @@
+<!--gets the string entered by the user and outputs it in landing-page-->
+<app-search-bar (newSearchedElement)="getRequestedCity($event)"></app-search-bar>
+
+<!--inputs the string entered by the user and output by search-bar into  content-page-->
+<app-content-page [requestedCity]="newRequestedCity"></app-content-page>
