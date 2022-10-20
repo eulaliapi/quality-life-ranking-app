@@ -3,11 +3,11 @@
     <div class="container main">
         <h1 class="heading">Learn about the quality of life city ranking.</h1>
 
-        <form #requestingCity="ngForm" (ngSubmit)="onSubmit(requestedCity.value)">
+        <form #requestingCity="ngForm" (ngSubmit)="onSubmit(requestingCity)">
             <!--label-->
             <label for="city-search">Insert the name of the city here:</label>
             <!--search bar-->
-            <input type="search" id="city-search" #requestedCity>
+            <input type="search" id="city-search" name="city" ngModel>
             <!--search button-->
             <button class="button" type="submit"><i class="fa-solid fa-search"></i></button>
         </form>

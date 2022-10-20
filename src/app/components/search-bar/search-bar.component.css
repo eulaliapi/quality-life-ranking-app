@@ -9,8 +9,12 @@
     font-size: var(--fs-500);
 }
 
+form {
+    display: flex;
+    flex-direction: column;
+}
+
 label {
-    display: block;
     font-weight: var(--fw-semibold);
     font-size: var(--fs-400);
 }
@@ -42,6 +46,16 @@ input:focus-visible {
 
 .button:hover {
     background-color: var(--clr-primary-300);
+}
+
+@media screen and (min-width: 340px) {
+    form {
+        display: block;
+    }
+    
+    label {
+        display: block;
+    }
 }
 
 @media screen and (min-width: 576px) {

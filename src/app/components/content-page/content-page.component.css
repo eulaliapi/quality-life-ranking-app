@@ -1,5 +1,48 @@
+
 .inverted {
     min-height: 50vh;
     background-color: var(--clr-primary-100);
     color: var(--clr-primary-400)
+}
+
+.heading {
+  margin-bottom: 2rem;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-500);
+}
+
+li {
+  list-style-type: square;
+  font-weight: var(--fw-semibold);
+}
+
+.link {
+  cursor: pointer;
+  color: var(--clr-primary-400);
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: var(--clr-primary-300);
+}
+
+.link:visited {
+  color: var(--clr-secondary-200);
+}
+
+.city-info {
+  text-align: right;
+  margin: 0.5rem 0;
+  padding: 0 0.5rem;
+  font-size: var(--fs-300);
+  font-weight: var(--fw-regular);
+  font-style: italic;
+  color: var(--clr-primary-200);
+
+}
+
+@media screen and (min-width: 992px) {
+  ul {
+    columns: 2;
   }
+}

@@ -1,6 +1,6 @@
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { FormsModule, NgForm } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 
 import { SearchBarComponent } from './search-bar.component';
@@ -71,21 +71,24 @@ describe('SearchBarComponent', () => {
       it('<input> value should be submitted', () => {
         spyOn(component, 'onSubmit')
 
-        inputEl.nativeElement.value ='testCity';
         formEl.triggerEventHandler('ngSubmit', null);
         fixture.detectChanges();
-
-        expect(component.onSubmit).toHaveBeenCalledWith('testCity');
+        expect(component.onSubmit).toHaveBeenCalled();
       })
 
     });
 
     it('should emit when submitted', () => {
+      spyOn(component, 'onSubmit');
       spyOn(component.newSearchedElement, 'emit');
-      formEl.triggerEventHandler('ngSubmit', null);
+
+
+      btnEl.nativeElement.click();
+      expect(component.onSubmit).toHaveBeenCalled();
       fixture.detectChanges();
-      expect(component.newSearchedElement.emit).toHaveBeenCalled();
-    })
+      expect(component.newSearchedElement.emit).toHaveBeenCalled()
+
+    });
 
   });
 

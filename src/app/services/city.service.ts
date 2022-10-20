@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-import { filter, forkJoin, map, Observable, of, switchMap} from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { filter, forkJoin, map, Observable, of, mergeMap } from 'rxjs';
+import { catchError, distinct, switchMap, toArray } from 'rxjs/operators';
 
-import { CityItem, Links, RootObject } from '../models/cityList.model';
-import { CityUrbanArea, RootObject2 } from '../models/cityGeoIdInfo.model';
-import { RootObject3, UaImages, UaScores } from '../models/urbanArea.model';
+import { RootObject } from '../models/cityList.model';
+import { RootObject2 } from '../models/cityGeoIdInfo.model';
+import { RootObject3} from '../models/urbanArea.model';
 import { RootObject4, Image } from '../models/urbanAreaImages.model';
-import { RootObject5 } from '../models/urbanAreaScores.model';
+import { Category, RootObject5 } from '../models/urbanAreaScores.model';
 
 
 @Injectable({
@@ -30,90 +30,96 @@ export class CityService {
     };
   }
 
-  //gets the list of the id urls for each city that matches the query
-  getCityList(encoded: string): Observable<Links["city:item"]["href"]> {
-    return this.http.get<RootObject>(`https://api.teleport.org/api/cities/?search=${encoded}`)
-    .pipe(
-      map( object => object["_embedded"]["city:search-results"]),
-      switchMap( objs => objs ),
-      map( obj => obj["_links"]["city:item"]["href"]),
-      catchError(this.handleError<Links["city:item"]["href"]>('getCityList', '')),
+  //gets the list of those cities that match the query
+  getCitySearchArr(encoded: string): Observable<RootObject2[]> {
+    let UAs$ = this.http.get<RootObject>(`https://api.teleport.org/api/cities/?search=${encoded}`).pipe(
+      map(obj => obj["_embedded"]["city:search-results"]),
+      switchMap(objs => objs),
+      mergeMap(obj => this.http.get<RootObject2>(obj["_links"]["city:item"]["href"])),
+      filter(obj => obj["_links"]["city:urban_area"] !== undefined),
+      distinct(obj => obj["_links"]["city:urban_area"]["href"]),
+      toArray(),
+      catchError(this.handleError<RootObject2[]>('getCitySearchArr')),
     );
+
+    return UAs$;
   };
 
-  //gets the urban area for each city and removes those the result of which is undefined
-  getUAInfos(url: CityItem["href"]): Observable<[CityUrbanArea, number]> {
-    let urbanArea = this.http.get<RootObject2>(url).pipe(
-      map(obj => obj["_links"]["city:urban_area"]),
-      filter(obj => obj !== undefined),
-      catchError(this.handleError<CityUrbanArea>('getUrbanAreaObj')),
-    )
+  //gets Urban Area Infos
+  getUrbanArea(id: number): Observable<[RootObject3["name"], Image, [RootObject5["summary"], RootObject5["teleport_city_score"], Category[]]]>  {
 
-    let id = this.http.get<RootObject2>(url).pipe(
-      map(obj => obj["geoname_id"]),
-      // catchError(this.handleError<number>('getId')),
-    )
+    let stream$ = this.http.get<RootObject2>(`https://api.teleport.org/api/cities/geonameid:${id}/`).pipe(
+      mergeMap(obj => this.http.get<RootObject3>((obj["_links"]["city:urban_area"]["href"]))),
+      catchError(this.handleError<RootObject3>('getUrbanArea'))
+    );
 
-    return forkJoin([urbanArea, id])
-  }
-
-  //gets the urban area url from id
-  getUrbanAreaUrl(id: number) : Observable<CityItem["href"]> {
-    let url = `https://api.teleport.org/api/cities/geonameid:${id}/`;
-
-    return this.getUAInfos(url).pipe(
-      map(obj => obj[0]["href"]),
-      catchError(this.handleError<CityItem["href"]>('getUrbanAreaUrl', '')),
-    )
+    return this.getDetails(stream$);
 
   };
 
-  //gets urban area name, images and scores
-  getUAUrlsDetails(url: CityItem["href"]): Observable<[RootObject3["full_name"],UaImages,UaScores]> {
-    let name = this.http.get<RootObject3>(url).pipe(
-      map(obj => obj["full_name"]),
-      catchError(this.handleError<RootObject3["full_name"]>('getUAname', '')),
-    )
-
-    let images = this.http.get<RootObject3>(url).pipe(
-      map(obj => obj["_links"]["ua:images"]),
-      catchError(this.handleError<UaImages>('getUAImages')),
-    );
-
-    let scores = this.http.get<RootObject3>(url).pipe(
-      map(obj => obj["_links"]["ua:scores"]),
-      catchError(this.handleError<UaScores>('getUAScores')),
-    );
+  //gets name, images, summary, teleport city score, categories
+  getDetails(obj: Observable<RootObject3>): Observable<[RootObject3["name"], Image, [RootObject5["summary"], RootObject5["teleport_city_score"], Category[]]]> {
+    let name = this.getName(obj);
+    let images = this.getImages(obj);
+    let scores = this.getScoresInfos(obj);
 
     return forkJoin([name, images, scores])
-  }
+  };
 
-  //gets UA images
-  getImages(url: UaImages["href"]): Observable<Image> {
-    return this.http.get<RootObject4>(url).pipe(
+  //gets the name of the city
+  getName(obj: Observable<RootObject3>): Observable<RootObject3["name"]> {
+    
+    let name$ = obj.pipe(
+      map(obj => obj["name"]),
+      catchError(this.handleError<string>('getName'))
+    );
+
+    return name$;
+    
+  };
+
+  //gets city's images
+  getImages(obj: Observable<RootObject3>): Observable<Image> {
+    let images$ = obj.pipe(
+      mergeMap(obj => this.http.get<RootObject4>(obj["_links"]["ua:images"]["href"])),
       map(obj => obj["photos"][0]["image"]),
-      catchError(this.handleError<Image>('getImages')),
-    )
-  }
-
-  //gets UA teleport's city score, UA's teleport's city description and UA's scores
-  getCityRankingDetails(url: UaScores["href"]): Observable<[RootObject5["teleport_city_score"], RootObject5["summary"], RootObject5["categories"]]> {
-    let teleportCityScore = this.http.get<RootObject5>(url).pipe(
-      map(obj => obj["teleport_city_score"]),
-      catchError(this.handleError<RootObject5["teleport_city_score"]>('getTeleportScore', 0)),
+      catchError(this.handleError<Image>('getImages'))
     );
 
-    let summary = this.http.get<RootObject5>(url).pipe(
+    return images$;
+  };
+
+  //gets scores url
+  getScoresInfos(obj: Observable<RootObject3>): Observable<[RootObject5["summary"], RootObject5["teleport_city_score"], Category[]]> {
+
+    let scoresUrl$ = obj.pipe(
+      mergeMap(obj => this.http.get<RootObject5>(obj["_links"]["ua:scores"]["href"])),
+      catchError(this.handleError<RootObject5>('getScoresInfos'))
+    );
+
+    return this.getScoresDetails(scoresUrl$);
+  };
+
+  //get scores objects' summary, teleport city score and category
+  getScoresDetails(obj: Observable<RootObject5>): Observable<[RootObject5["summary"], RootObject5["teleport_city_score"], Category[]]>  {
+
+    let summary$ = obj.pipe(
       map(obj => obj["summary"]),
-      catchError(this.handleError<RootObject5["summary"]>('getCitySummary', '')),
+      catchError(this.handleError<string>('getScoresDetailsSummary'))
     );
 
-    let categories = this.http.get<RootObject5>(url).pipe(
+    let globalScore$ = obj.pipe(
+      map(obj => obj["teleport_city_score"]),
+      catchError(this.handleError<number>('getScoreDetailsGlobalScore'))
+    );
+
+    let categories$ = obj.pipe(
       map(obj => obj["categories"]),
-      catchError(this.handleError<RootObject5["categories"]>('getScores', [])),
+      catchError(this.handleError<Category[]>('getScoresDetailsCategories'))
     );
 
-    return forkJoin([teleportCityScore, summary, categories])
-  }
+    return forkJoin([summary$, globalScore$, categories$]);
+  };
+
 
 }

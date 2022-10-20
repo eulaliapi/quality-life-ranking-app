@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { CityService } from 'src/app/services/city.service';
 
-import { CityUrbanArea } from 'src/app/models/cityGeoIdInfo.model';
+import { RootObject2 } from 'src/app/models/cityGeoIdInfo.model';
 
 
 @Component({
@@ -14,62 +14,33 @@ export class ContentPageComponent implements OnInit, OnChanges {
   //input property
   @Input() requestedCity?: string;
 
-  //checks if cityList is empty
-  fullList: boolean = false;
-  showMsg: boolean = false;
-  availableUAs: [CityUrbanArea, number][] = [];
-  filteredCityList: [CityUrbanArea, number][] = [];
+  showCityList: boolean = true;
+  cityList: RootObject2[] = [];
 
   constructor(private cityService: CityService) { }
 
-  ngOnInit(): void { };
+  ngOnInit(): void {};
 
-  //when city is entered getCityList is fired 
+  //when city is entered getCitySearchRes is fired 
   ngOnChanges(): void {
-    this.fullList = true;
     if (this.requestedCity) {
-      this.getCityList();
+      this.getCitySearchRes();
     }
   }
 
-  //encodes the string and gets the list of cities that match the query
-  getCityList() {
-    this.availableUAs = [];
+  //encodes the string and gets the list of those cities that match the query
+  getCitySearchRes() {
     if (this.requestedCity) {
       let encoded = encodeURIComponent(this.requestedCity);
-      this.cityService.getCityList(encoded).subscribe((url) => this.cityService.getUAInfos(url).subscribe((ua) => this.availableUAs.push(ua)))};
-    //this way I can get the last array with the right index
-    setTimeout(() => {
-      this.showChildComponent()
-    }, 1000)
+      this.cityService.getCitySearchArr(encoded).subscribe(arr => {
+        this.cityList = arr;
+        this.cityList.length > 0 ? this.showCityList = true : this.showCityList = false;
+      });
+    };
+    
   };
 
-  //shows info-message or city-list according to availableUAs.length
-  showChildComponent() {
-    if (this.availableUAs.length > 0) {
-      this.fullList = true;
-      this.showMsg = true;
-    } else {
-      this.fullList = false;
-      this.showMsg = false;
-    }
-    this.collectUniqueUAs();
-  };
-
-  //obtains the list with the cities that are UAs without duplicates
-  collectUniqueUAs() {
-    const uniqueHrefs: CityUrbanArea["href"][] = [];
-    const UniqueUAs = this.availableUAs.filter(obj => {
-      const isDuplicate = uniqueHrefs.includes(obj[0]["href"]);
-
-      if (!isDuplicate) {
-        uniqueHrefs.push(obj[0]["href"]);
-        return true;
-      }
-      return false;
-    });
-    this.filteredCityList = UniqueUAs;
-  };
+  
 
 
 }

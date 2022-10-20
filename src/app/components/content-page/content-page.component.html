@@ -1,6 +1,28 @@
 <div class="container inverted">
-    <!--city list-->
-        <app-city-list [showList]="fullList" [showMsg]="showMsg" [cityList]="filteredCityList"></app-city-list>
-    <!--no info available-->
-       <app-info-message [showList]="fullList"></app-info-message> 
+    <ng-template  *ngIf="showCityList; then showList  else showMsg" ></ng-template>
+
+    <section >
+
+        <!--list of cities that match the query-->
+        <ng-template #showList>
+            <ul>
+                <li *ngFor="let city of cityList"><a class="link"
+                        routerLink="/city-ranking/{{city.geoname_id}}">{{city["full_name"]}} ({{city["_links"]["city:urban_area"]["name"]}})</a></li>
+            </ul>
+
+            <div *ngIf="cityList.length > 0" class="city-info">
+                <p>*If your city is not in this list, it means we don't have information about that city yet. Please enter
+                    another city.</p>
+            </div>
+
+        </ng-template>
+
+        <!--no city matches the query-->
+        <ng-template #showMsg>
+            <p class="heading">We're sorry!</p>
+            <p>There are no available information for this city yet.<br>Try searching for another one!</p>
+        </ng-template>
+
+    </section>
+
 </div>

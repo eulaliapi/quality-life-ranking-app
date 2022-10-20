@@ -1,9 +1,0 @@
-<!--list of cities that match the query-->
-<section *ngIf="showList">
-        <ul>
-            <li *ngFor="let city of cityList"><a class="link" routerLink="/city-ranking/{{city[1]}}">{{city[0].name}}</a></li>
-        </ul>
-        <div *ngIf="showMsg" class="city-info">
-            <p>*If your city is not in this list, it means we don't have information about that city yet. Please enter another city.</p>
-        </div>
-</section>

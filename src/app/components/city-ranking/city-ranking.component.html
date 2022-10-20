@@ -1,30 +1,45 @@
-<!--header-->
-<header class="cover-img" [ngStyle]="bgImage">
-    <!--info-->
-    <div class="shadow">
-        <!--go back btn-->
-        <button class="arrow-button" type="button" (click)="goBack()"><i class="fa-solid fa-arrow-left"></i></button>
+<ng-template *ngIf="city; then showCity else loading"></ng-template>
 
-        <!--city's name-->
-        <h1 class="city-name">{{cityName}}</h1>
-        <!--description-->
-        <p class="city-desc" [innerHTML]="citySummary"></p>
-        <p class="city-score">Teleport city score: {{teleportCityScore}}%</p>
+<section>
+
+    <ng-template #showCity>
+        <!--header-->
+        <header class="cover-img" [ngStyle]="bgImage">
+            <!--info-->
+            <div class="shadow">
+                <!--go back btn-->
+                <button class="arrow-button" type="button" (click)="goBack()"><i
+                        class="fa-solid fa-arrow-left"></i></button>
+
+                <!--city's name-->
+                <h1 class="city-name">{{city[0]}}</h1>
+                <!--description-->
+                <p class="city-desc" [innerHTML]="city[2][0]"></p>
+                <p class="city-score">Teleport city score: {{city[2][1] | number: '1.1-1'}}%</p>
+            </div>
+        </header>
+
+        <!--scores-->
+        <div>
+            <ul class="list-group">
+                <!--score info-->
+
+                <li *ngFor="let cityScore of city[2][2]" class="score-info">
+                    <!--score bar-->
+                    <div class="total-width"></div>
+                    <!--actual score-->
+                    <div class="score" [ngStyle]="setScoreWidth(cityScore.score_out_of_10)"></div>
+                    <p class="score-name">{{cityScore.name}} {{cityScore.score_out_of_10 | number: '1.0-0'}}/10</p>
+                </li>
+
+            </ul>
+        </div>
+
+    </ng-template>
+
+    <ng-template #loading>
+    <div class="loading-container">
+        <p class="loading-text">Loading...</p>
     </div>
-</header>
-
-<!--scores-->
-<div>
-    <ul class="list-group">
-        <!--score info-->
-        
-        <li *ngFor="let cityScore of cityScores" class="score-info">
-                <!--score bar-->
-                <div class="total-width"></div>
-                <!--actual score-->
-                <div class="score" [style.width.rem]="cityScore.score_out_of_10"></div>
-            <p class="score-name">{{cityScore.name}} {{Math.round(cityScore.score_out_of_10)}}/10</p>
-        </li>
-
-    </ul>
-</div>
+    </ng-template>
+</section>
