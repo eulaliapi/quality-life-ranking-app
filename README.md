@@ -35,4 +35,4 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 
 ## Additional info
 
-Try the app [here](https://quality-life-app.web.app/landing-page)!
+Try the app [here](https://quality-life-app.web.app/)!
