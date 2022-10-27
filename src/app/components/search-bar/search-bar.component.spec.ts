@@ -1,22 +1,19 @@
-import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, NgForm } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { first } from 'rxjs';
 
 import { SearchBarComponent } from './search-bar.component';
 
 describe('SearchBarComponent', () => {
   let component: SearchBarComponent;
   let fixture: ComponentFixture<SearchBarComponent>;
-  
-  let sectionEl: DebugElement;
-  let divEl: DebugElement;
-  let h1El: DebugElement;
-  let formEl: DebugElement;
-  let labelEl: DebugElement;
-  let inputEl: DebugElement;
-  let btnEl: DebugElement;
-  let btnIcon: DebugElement;
+
+  let testForm =<NgForm>{
+    value: {
+      city: "testCity  "
+    }
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -30,16 +27,6 @@ describe('SearchBarComponent', () => {
     fixture = TestBed.createComponent(SearchBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
-    sectionEl = fixture.debugElement.query(By.css('section'));
-    divEl = fixture.debugElement.query(By.css('div'));
-    h1El = fixture.debugElement.query(By.css('h1'));
-
-    formEl = fixture.debugElement.query(By.css('form'));
-    labelEl = fixture.debugElement.query(By.css('label'));
-    inputEl = fixture.debugElement.query(By.css('input'));
-    btnEl = fixture.debugElement.query(By.css('button'));
-    btnIcon = fixture.debugElement.query(By.css('i'));
   });
 
   it('should create', () => {
@@ -48,54 +35,69 @@ describe('SearchBarComponent', () => {
 
   describe('HTML Content', () => {
 
-    it('should contain a <section> element populated with a <div> which should be populated with a <h1> and a <form> tag', () => {
-      expect(sectionEl).toBeDefined();
-      expect(sectionEl.nativeElement.children[0]).toBe(divEl.nativeNode);
+    it('should contain a <div> which should contain a <form>', () => {
 
-      expect(divEl.nativeElement.children[0]).toBe(h1El.nativeNode);
-      expect(h1El.nativeElement.textContent).toBe("Learn about the quality of life city ranking.");
-      expect(divEl.nativeElement.children[1]).toBe(formEl.nativeNode);
+      let formContainer = fixture.debugElement.query(By.css('div'));
+      let form = fixture.debugElement.query(By.css('form'));
+
+      expect(formContainer).toBeTruthy();
+      expect(formContainer.children[1]).toBe(form);
     });
 
     describe('form', () => {
 
-      it('should contain a <label> tag, an <input> tag and a <button> in this order', () => {
-        expect(formEl.nativeElement.children[0]).toBe(labelEl.nativeNode);
-        expect(labelEl.nativeElement.textContent).toBe("Insert the name of the city here:");
-        expect(formEl.nativeElement.children[1]).toBe(inputEl.nativeNode);
-        expect(formEl.nativeElement.children[2]).toBe(btnEl.nativeNode);
-        expect(btnEl.nativeElement.children[0]).toBe(btnIcon.nativeNode);
-        expect(btnIcon.nativeElement.classList.value).toBe("fa-solid fa-search");
+      it('should contain a label, an input and a button in this order', () => {
+
+        let form = fixture.debugElement.query(By.css('form'));
+        let label = fixture.debugElement.query(By.css('label'));
+        let input = fixture.debugElement.query(By.css('input'));
+        let button = fixture.debugElement.query(By.css('button'));
+
+        expect(form).toBeTruthy();
+        expect(label).toBeTruthy();
+        expect(input).toBeTruthy();
+        expect(button).toBeTruthy();
+
+        expect(form.children[0]).toBe(label);
+        expect(form.children[1]).toBe(input);
+        expect(form.children[2]).toBe(button);
       });
 
-      it('<input> value should be submitted', () => {
-        spyOn(component, 'onSubmit')
+      it('label for attribute should equal input id', () => {
+        let label = fixture.debugElement.query(By.css('label'));
+        let input = fixture.debugElement.query(By.css('input'));
 
-        formEl.triggerEventHandler('ngSubmit', null);
-        fixture.detectChanges();
-        expect(component.onSubmit).toHaveBeenCalled();
-      })
-
-    });
-
-    it('should emit when submitted', () => {
-      spyOn(component, 'onSubmit');
-      spyOn(component.newSearchedElement, 'emit');
-
-
-      btnEl.nativeElement.click();
-      expect(component.onSubmit).toHaveBeenCalled();
-      fixture.detectChanges();
-      expect(component.newSearchedElement.emit).toHaveBeenCalled()
+        expect(label.attributes['for']).toEqual(input.attributes['id']);
+      });
 
     });
 
   });
 
+  it('should call onSubmit() when form is submitted', () => {
+    let spyOnSubmit = spyOn(component, 'onSubmit');
 
+    let form = fixture.debugElement.query(By.css('form'));
 
+    form.triggerEventHandler('ngSubmit', null);
+    fixture.detectChanges();
+    expect(spyOnSubmit).toHaveBeenCalledTimes(1);
 
+    spyOnSubmit(testForm);
+    expect(spyOnSubmit).toHaveBeenCalledWith(testForm);
 
+  });
 
+  it('should output a string when onSubmit() is called', () => {
+    let buttonDe = fixture.debugElement.query(By.css('.button'));
+    let emittedString: string | undefined;
+    let expectedString = "testcity";
+
+    buttonDe.triggerEventHandler('submit', null);
+
+    component.newSearchedElement.subscribe((data: string) => emittedString = data );
+    expect(emittedString).toEqual(expectedString);
+    
+  });
 
 });

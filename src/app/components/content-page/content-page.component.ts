@@ -10,7 +10,7 @@ import { RootObject2 } from 'src/app/models/cityGeoIdInfo.model';
   styleUrls: ['./content-page.component.css']
 })
 export class ContentPageComponent implements OnInit, OnChanges {
-
+   
   //input property
   @Input() requestedCity?: string;
 
@@ -39,8 +39,5 @@ export class ContentPageComponent implements OnInit, OnChanges {
     };
     
   };
-
-  
-
 
 }

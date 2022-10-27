@@ -32,7 +32,7 @@ export class CityService {
 
   //gets the list of those cities that match the query
   getCitySearchArr(encoded: string): Observable<RootObject2[]> {
-    let UAs$ = this.http.get<RootObject>(`https://api.teleport.org/api/cities/?search=${encoded}`).pipe(
+    let UAs = this.http.get<RootObject>(`https://api.teleport.org/api/cities/?search=${encoded}`).pipe(
       map(obj => obj["_embedded"]["city:search-results"]),
       switchMap(objs => objs),
       mergeMap(obj => this.http.get<RootObject2>(obj["_links"]["city:item"]["href"])),
@@ -42,18 +42,18 @@ export class CityService {
       catchError(this.handleError<RootObject2[]>('getCitySearchArr')),
     );
 
-    return UAs$;
+    return UAs;
   };
 
   //gets Urban Area Infos
   getUrbanArea(id: number): Observable<[RootObject3["name"], Image, [RootObject5["summary"], RootObject5["teleport_city_score"], Category[]]]>  {
 
-    let stream$ = this.http.get<RootObject2>(`https://api.teleport.org/api/cities/geonameid:${id}/`).pipe(
+    let urbanArea = this.http.get<RootObject2>(`https://api.teleport.org/api/cities/geonameid:${id}/`).pipe(
       mergeMap(obj => this.http.get<RootObject3>((obj["_links"]["city:urban_area"]["href"]))),
       catchError(this.handleError<RootObject3>('getUrbanArea'))
     );
 
-    return this.getDetails(stream$);
+    return this.getDetails(urbanArea);
 
   };
 
@@ -69,56 +69,56 @@ export class CityService {
   //gets the name of the city
   getName(obj: Observable<RootObject3>): Observable<RootObject3["name"]> {
     
-    let name$ = obj.pipe(
+    let name = obj.pipe(
       map(obj => obj["name"]),
       catchError(this.handleError<string>('getName'))
     );
 
-    return name$;
+    return name;
     
   };
 
   //gets city's images
   getImages(obj: Observable<RootObject3>): Observable<Image> {
-    let images$ = obj.pipe(
+    let images = obj.pipe(
       mergeMap(obj => this.http.get<RootObject4>(obj["_links"]["ua:images"]["href"])),
       map(obj => obj["photos"][0]["image"]),
       catchError(this.handleError<Image>('getImages'))
     );
 
-    return images$;
+    return images;
   };
 
   //gets scores url
   getScoresInfos(obj: Observable<RootObject3>): Observable<[RootObject5["summary"], RootObject5["teleport_city_score"], Category[]]> {
 
-    let scoresUrl$ = obj.pipe(
+    let scoresUrl = obj.pipe(
       mergeMap(obj => this.http.get<RootObject5>(obj["_links"]["ua:scores"]["href"])),
       catchError(this.handleError<RootObject5>('getScoresInfos'))
     );
 
-    return this.getScoresDetails(scoresUrl$);
+    return this.getScoresDetails(scoresUrl);
   };
 
   //get scores objects' summary, teleport city score and category
   getScoresDetails(obj: Observable<RootObject5>): Observable<[RootObject5["summary"], RootObject5["teleport_city_score"], Category[]]>  {
 
-    let summary$ = obj.pipe(
+    let summary = obj.pipe(
       map(obj => obj["summary"]),
       catchError(this.handleError<string>('getScoresDetailsSummary'))
     );
 
-    let globalScore$ = obj.pipe(
+    let globalScore = obj.pipe(
       map(obj => obj["teleport_city_score"]),
       catchError(this.handleError<number>('getScoreDetailsGlobalScore'))
     );
 
-    let categories$ = obj.pipe(
+    let categories = obj.pipe(
       map(obj => obj["categories"]),
       catchError(this.handleError<Category[]>('getScoresDetailsCategories'))
     );
 
-    return forkJoin([summary$, globalScore$, categories$]);
+    return forkJoin([summary, globalScore, categories]);
   };
 
 

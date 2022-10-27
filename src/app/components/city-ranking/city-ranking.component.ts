@@ -14,11 +14,11 @@ import { CityService } from 'src/app/services/city.service';
 export class CityRankingComponent implements OnInit {
 
   city!: [string, Image, [string, number, Category[]]];
-  bgImage: Record<string, string> = {};
+  // bgImage: Record<string, string> = {};
 
   constructor(
     private route: ActivatedRoute,
-    private location: Location,
+    public location: Location,
     private cityService: CityService
   ) { }
 
@@ -26,25 +26,23 @@ export class CityRankingComponent implements OnInit {
     this.getUAUrls();
   }
 
-  //goes back to the page that was desplayed before
+  //goes back to the page that was displayed before
   goBack() {
     this.location.back();
   }
 
   getUAUrls() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.cityService.getUrbanArea(id).subscribe(res => {
-      this.city = res;
-      this.setBgImage(res[1])}
-    );
+    this.cityService.getUrbanArea(id).subscribe(res => this.city = res);
   };
 
   //adjusts the background of the header's element
   setBgImage(imgs: Image) {
-    this.bgImage = {
+    let bgImage = {
       'background': window.innerWidth < 576 ? `url(${imgs.mobile})` : `url(${imgs.web})`,
       'background-size': 'cover',
     };
+    return bgImage
   };
 
   //adjusts scoreBarWidth based on screen size

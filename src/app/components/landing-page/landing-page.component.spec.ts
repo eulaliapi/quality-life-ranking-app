@@ -1,5 +1,6 @@
-import { Component, Input, } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
 import { LandingPageComponent } from './landing-page.component';
 
@@ -7,23 +8,10 @@ describe('LandingPageComponent', () => {
   let component: LandingPageComponent;
   let fixture: ComponentFixture<LandingPageComponent>;
 
-  @Component({
-    selector: 'app-search-bar',
-    template: '<p></p>',
-  })
-  class MockSearchBarComponent { }
-
-  @Component({
-    selector: 'app-content-page',
-    template: '<p>Mock app-content-page</p>',
-  })
-  class MockContentPageComponent {
-    @Input() requestedCity!: string;
-  }
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LandingPageComponent, MockSearchBarComponent, MockContentPageComponent ]
+      declarations: [ LandingPageComponent ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
     .compileComponents();
   });
@@ -36,11 +24,20 @@ describe('LandingPageComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(MockSearchBarComponent).toBeTruthy();
-    expect(MockContentPageComponent).toBeTruthy();
   });
 
-  xit('getRequestedCity() should set its parameter to newRequestedCity', () => {
+  it('variable "newRequestedCity" should be an empty string', () => {
     
+    expect(component.newRequestedCity).toEqual("");
   });
+
+  it('"newRequestedCity" value should equal to "getRequestedCity" parameter', fakeAsync(() => {
+    const searchBarDe = fixture.debugElement.query(By.css('app-search-bar'));
+    searchBarDe.triggerEventHandler('newSearchedElement', "testcity");
+    tick();
+
+    expect(component.newRequestedCity).toEqual("testcity");
+
+  }));
+
 });
