@@ -1,5 +1,5 @@
-.loading-container {
-    min-height: 90vh;
+section {
+    min-height: 100vh;
 }
 
 .loading-text {
